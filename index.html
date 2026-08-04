@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ads Up - Marketing, Tecnologia e Consultoria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #030712;
+            /* Deep dark background */
+            --bg-surface: #0f172a;
+            /* Dark blue surface */
+            --text-main: #f9fafb;
+            --text-muted: #f1f5f9;
+            --accent-neon: #00e5ff;
+            /* Neon blue for details */
+            --accent-neon-glow: rgba(0, 229, 255, 0.4);
+            --glass-bg: rgba(15, 23, 42, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border-hover: rgba(0, 229, 255, 0.3);
+            --border-radius-pill: 9999px;
+            --border-radius-card: 16px;
+            --border-radius-lg: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Fixed Video Canvas */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+            /* Stronger mask to ensure text readability over the video */
+            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 40%, rgba(0, 0, 0, 0.2) 100%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 40%, rgba(0, 0, 0, 0.2) 100%);
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 229, 255, 0.08), transparent 70%), rgba(3, 7, 18, 0.6);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* UI Container */
+        #container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+        }
+
+        .max-w {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Typography */
+        h1,
+        h2,
+        h3,
+        h4 {
+            margin: 0;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        p {
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .section-padding {
+            padding: 120px 0;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-neon {
+            color: var(--accent-neon);
+        }
+
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        /* Recreating the provided logo */
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border-radius: 8px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 6px;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .logo-icon::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 6px;
+            width: 20px;
+            height: 14px;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M2 20C7 15 12 10 22 4M22 4H15M22 4V11' stroke='%23fbbf24' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+            background-size: cover;
+            z-index: 2;
+        }
+
+        .logo-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 14px;
+        }
+
+        .logo-bar {
+            width: 5px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 1px;
+        }
+
+        .logo-bar:nth-child(1) {
+            height: 6px;
+        }
+
+        .logo-bar:nth-child(2) {
+            height: 10px;
+        }
+
+        .logo-bar:nth-child(3) {
+            height: 14px;
+        }
+
+        .btn-primary {
+            background: transparent;
+            color: var(--accent-neon);
+            border: 1px solid var(--accent-neon);
+            padding: 12px 28px;
+            border-radius: var(--border-radius-pill);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-neon);
+            color: #000;
+            box-shadow: 0 0 25px var(--accent-neon-glow);
+            transform: translateY(-2px);
+        }
+
+        .btn-solid {
+            background: var(--accent-neon);
+            color: #000;
+            border: none;
+            padding: 16px 36px;
+            border-radius: var(--border-radius-pill);
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 0 20px var(--accent-neon-glow);
+        }
+
+        .btn-solid:hover {
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.6);
+            transform: translateY(-2px);
+            background: #fff;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border: 1px solid var(--glass-border);
+            padding: 16px 36px;
+            border-radius: var(--border-radius-pill);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding-top: 80px;
+            min-height: 80vh;
+        }
+
+        .badge {
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: var(--border-radius-pill);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--accent-neon);
+            margin-bottom: 32px;
+            backdrop-filter: blur(5px);
+            letter-spacing: 0.5px;
+        }
+
+        .hero h1 {
+            font-size: clamp(40px, 6vw, 72px);
+            line-height: 1.1;
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin: 0 0 24px 0;
+            max-width: 900px;
+        }
+
+        .hero p {
+            color: var(--text-muted);
+            font-size: clamp(16px, 2vw, 20px);
+            margin: 0 0 48px 0;
+            max-width: 650px;
+            line-height: 1.6;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* Brands Section */
+        .brands {
+            text-align: center;
+            padding: 60px 0;
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.02), transparent);
+        }
+
+        .brands p {
+            color: var(--text-muted);
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 40px;
+            font-weight: 500;
+        }
+
+        .brands-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            opacity: 0.5;
+            filter: grayscale(100%);
+        }
+
+        .brand-logo {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+            letter-spacing: -0.5px;
+        }
+
+        /* Problem Section */
+        .problem-section {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .problem-section h2 {
+            font-size: clamp(32px, 4vw, 48px);
+            margin-bottom: 40px;
+            line-height: 1.2;
+        }
+
+        .problem-section p {
+            font-size: 20px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .problem-section p.highlight {
+            color: #fff;
+            font-weight: 500;
+            font-size: 24px;
+            margin-top: 48px;
+            border-left: 4px solid var(--accent-neon);
+            padding-left: 20px;
+        }
+
+        /* Three Pillars */
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+            margin-top: 60px;
+        }
+
+        .pillar-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-card);
+            padding: 40px;
+            backdrop-filter: blur(12px);
+            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .pillar-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--glass-border-hover);
+            box-shadow: 0 10px 40px rgba(0, 229, 255, 0.05);
+        }
+
+        .pillar-icon {
+            width: 56px;
+            height: 56px;
+            background: rgba(0, 229, 255, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            color: var(--accent-neon);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .pillar-card h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+
+        .pillar-card>p {
+            color: var(--text-muted);
+            margin-bottom: 32px;
+            font-size: 16px;
+            min-height: 48px;
+        }
+
+        .pillar-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .pillar-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            color: #e5e7eb;
+            font-weight: 500;
+        }
+
+        .pillar-list li svg {
+            color: var(--accent-neon);
+            flex-shrink: 0;
+        }
+
+        /* Differential */
+        .differential {
+            background: linear-gradient(180deg, rgba(15, 23, 42, 0) 0%, rgba(15, 23, 42, 0.6) 50%, rgba(15, 23, 42, 0) 100%);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .differential h2 {
+            font-size: clamp(36px, 5vw, 64px);
+            background: linear-gradient(to right, #fff, var(--accent-neon));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 32px;
+        }
+
+        .differential p {
+            font-size: 20px;
+            color: var(--text-muted);
+            max-width: 800px;
+            margin: 0 auto 16px auto;
+        }
+
+        /* Timeline / How it Works */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 80px auto 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 24px;
+            width: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 80px;
+            margin-bottom: 60px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 50px;
+            height: 50px;
+            background: var(--bg-color);
+            border: 2px solid var(--accent-neon);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--accent-neon);
+            font-size: 18px;
+            box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+            z-index: 2;
+        }
+
+        .timeline-item h3 {
+            font-size: 28px;
+            margin-bottom: 12px;
+            padding-top: 8px;
+        }
+
+        .timeline-item p {
+            color: var(--text-muted);
+            font-size: 18px;
+        }
+
+        /* Portfolio Carousel */
+        .portfolio-carousel-container {
+            position: relative;
+            margin-top: 40px;
+            width: 100%;
+        }
+
+        .portfolio-carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            gap: 20px;
+            padding-bottom: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-neon) rgba(255, 255, 255, 0.1);
+        }
+
+        .portfolio-carousel::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .portfolio-carousel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        .portfolio-carousel::-webkit-scrollbar-thumb {
+            background: var(--accent-neon);
+            border-radius: 4px;
+        }
+
+        .portfolio-carousel-item {
+            flex: 0 0 85%;
+            scroll-snap-align: center;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(10, 15, 30, 0.6);
+            backdrop-filter: blur(10px);
+        }
+
+        @media (min-width: 768px) {
+            .portfolio-carousel-item {
+                flex: 0 0 45%;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .portfolio-carousel-item {
+                flex: 0 0 30%;
+            }
+        }
+
+        .portfolio-carousel-item img {
+            width: 100%;
+            height: auto;
+            display: block;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .portfolio-carousel-item:hover img {
+            transform: scale(1.02);
+        }
+
+        /* Benefits */
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 60px;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 40px;
+        }
+
+        .benefit-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 32px;
+            border-radius: var(--border-radius-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .benefit-card h4 {
+            font-size: 20px;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .benefit-card p {
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        /* FAQ */
+        .faq-container {
+            max-width: 800px;
+            margin: 60px auto 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        details {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+
+        details[open] {
+            border-color: rgba(0, 229, 255, 0.3);
+        }
+
+        summary {
+            padding: 24px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        summary::-webkit-details-marker {
+            display: none;
+        }
+
+        summary::after {
+            content: '+';
+            color: var(--accent-neon);
+            font-size: 24px;
+            font-weight: 400;
+        }
+
+        details[open] summary::after {
+            content: '−';
+        }
+
+        .faq-content {
+            padding: 0 24px 24px 24px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 16px;
+        }
+
+        /* Final CTA */
+        .final-cta {
+            background: #050a15;
+            position: relative;
+            overflow: hidden;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .final-cta::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .final-cta .max-w {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 120px 24px;
+        }
+
+        .final-cta h2 {
+            font-size: clamp(40px, 5vw, 64px);
+            margin-bottom: 32px;
+            max-width: 800px;
+        }
+
+        .final-cta p {
+            font-size: 20px;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin-bottom: 24px;
+        }
+
+        /* Responsive */
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                overflow-x: hidden;
+                width: 100%;
+            }
+
+            .max-w {
+                padding: 0 16px;
+                width: 100%;
+            }
+
+            .section-padding {
+                padding: 60px 0;
+            }
+
+            h1 {
+                font-size: clamp(28px, 8vw, 36px) !important;
+                line-height: 1.2;
+                text-align: center;
+                margin-bottom: 24px;
+            }
+
+            h2,
+            .text-neon {
+                font-size: clamp(24px, 7vw, 28px) !important;
+                line-height: 1.3;
+                text-align: center;
+            }
+
+            .hero {
+                padding: 100px 0 60px 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .hero p {
+                font-size: 16px;
+                text-align: center;
+                padding: 0 16px;
+                margin-bottom: 32px;
+            }
+
+            .badge {
+                margin-bottom: 24px;
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .hero-ctas {
+                flex-direction: column;
+                width: 100%;
+                gap: 16px;
+                align-items: stretch;
+                padding: 0 16px;
+            }
+
+            .hero-ctas a {
+                width: 100%;
+                text-align: center;
+                padding: 14px 20px;
+                font-size: 15px;
+                margin: 0;
+            }
+
+            nav {
+                padding: 16px 0;
+            }
+
+            .btn-primary {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .brands-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+
+            .brands p {
+                text-align: center;
+                font-size: 14px;
+                margin-bottom: 24px;
+            }
+
+            .brand-logo {
+                padding: 16px;
+                font-size: 16px;
+            }
+
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+                padding: 0 16px;
+            }
+
+            .pillars-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+                padding: 0 16px;
+            }
+
+            .benefits-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+                padding: 0 16px;
+            }
+
+            .problem-section {
+                padding: 40px 16px !important;
+                text-align: center;
+            }
+
+            .problem-section h2 {
+                margin-bottom: 24px !important;
+            }
+
+            .problem-section div p {
+                margin-bottom: 12px !important;
+            }
+
+            .problem-section .highlight {
+                text-align: center;
+            }
+
+            .timeline::before {
+                left: 24px;
+            }
+
+            .timeline-item {
+                padding-left: 56px;
+                padding-right: 16px;
+                padding-bottom: 40px;
+            }
+
+            .timeline-number {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+                left: 8px;
+            }
+
+            .timeline-content h3 {
+                font-size: 20px;
+            }
+
+            .final-cta {
+                padding: 80px 16px;
+            }
+
+            .final-cta h2 {
+                font-size: clamp(28px, 8vw, 36px);
+                margin-bottom: 24px;
+            }
+
+            .final-cta p {
+                font-size: 16px;
+                margin-bottom: 32px;
+                padding: 0 16px;
+            }
+
+            .faq-container {
+                padding: 0 16px;
+                margin-top: 40px;
+            }
+
+            summary {
+                padding: 16px;
+                font-size: 16px;
+            }
+
+            .faq-content {
+                padding: 0 16px 16px 16px;
+                font-size: 15px;
+            }
+
+            .glass-panel {
+                padding: 24px;
+            }
+
+            .statement {
+                font-size: clamp(24px, 8vw, 32px) !important;
+                padding: 80px 16px;
+            }
+
+            .card,
+            .portfolio-card,
+            .benefit-card {
+                padding: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-overlay"></div>
+    <canvas id="video-canvas"></canvas>
+
+    <div id="container">
+        <!-- Navbar -->
+        <div class="max-w">
+            <nav>
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <div class="logo-bars">
+                            <div class="logo-bar"></div>
+                            <div class="logo-bar"></div>
+                            <div class="logo-bar"></div>
+                        </div>
+                    </div>
+                    Ads Up
+                </a>
+                <a href="#contato" class="btn-primary">Fale conosco</a>
+            </nav>
+        </div>
+
+        <!-- Hero Section -->
+        <div class="max-w hero">
+            <div class="badge">
+                🚀 Marketing • Tecnologia • Consultoria
+            </div>
+
+            <h1>Seu negócio não precisa de mais esforço.<br>Precisa da estratégia certa para crescer.</h1>
+            <p style="color: #ffffff;">A Ads Up ajuda empresas a crescer através da combinação entre tráfego pago,
+                tecnologia e consultoria estratégica. Antes de indicar qualquer serviço, analisamos seu negócio para
+                identificar exatamente onde está o gargalo e criar a solução mais eficiente.</p>
+
+            <div class="hero-ctas">
+                <a href="#" class="btn-solid">Quero analisar meu negócio</a>
+                <a href="#metodologia" class="btn-secondary">Conheça nossa metodologia</a>
+            </div>
+        </div>
+
+        <!-- Brands -->
+        <div class="brands">
+            <div class="max-w">
+                <p>Empresas que escolheram crescer com estratégia</p>
+                <div class="brands-grid">
+                    <div class="brand-logo"><span style="font-size: 24px;">✖</span> zantic</div>
+                    <div class="brand-logo">BookStore</div>
+                    <div class="brand-logo">Wager</div>
+                    <div class="brand-logo">Unicoin</div>
+                    <div class="brand-logo">Crona</div>
+                    <div class="brand-logo">Nutricen</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Problem Section -->
+        <div class="section-padding max-w">
+            <div class="problem-section glass-panel">
+                <h2 class="text-neon" style="margin-bottom: 24px;">Nem sempre o problema da sua empresa é falta de
+                    clientes.</h2>
+                <div style="color: #ffffff; font-size: 18px; line-height: 1.8; margin-bottom: 32px;">
+                    <p>Algumas empresas precisam vender mais.</p>
+                    <p>Outras precisam automatizar processos.</p>
+                    <p>Algumas precisam de um sistema personalizado.</p>
+                    <p>Muitas simplesmente não sabem onde está o verdadeiro gargalo.</p>
+                </div>
+
+                <p class="highlight" style="color: var(--text-muted); font-size: 16px;">É exatamente por isso que a Ads
+                    Up existe.<br>Antes de vender qualquer solução, entendemos seu negócio.</p>
+            </div>
+        </div>
+
+        <!-- Three Pillars -->
+        <div class="section-padding max-w">
+            <h2 class="text-center" style="font-size: 48px; margin-bottom: 20px;">Uma empresa.<br>Três soluções.</h2>
+
+            <div class="pillars-grid">
+                <!-- Pillar 1 -->
+                <div class="pillar-card">
+                    <div class="pillar-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z">
+                            </path>
+                            <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                            <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                        </svg>
+                    </div>
+                    <h3>Marketing</h3>
+                    <p>Coloque sua empresa na frente das pessoas certas.</p>
+                    <ul class="pillar-list">
+                        <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Meta Ads</li>
+                        <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Funis</li>
+                        <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Landing Pages</li>
+                        <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Estratégia de aquisição</li>
+                    </ul>
+                </div>
+
+                <!-- Pillar 2 -->
+                <div class="pillar-card">
+                    <div class="pillar-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                    </div>
+                    <h3>Tecnologia</h3>
+                    <p>Transforme processos manuais em sistemas inteligentes.</p>
+                    <ul class="pillar-list">
+                        <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Micro SaaS</li>
+                        <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Sistemas personalizados</li>
+                        <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Dashboards</li>
+                        <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Integrações</li>
+                    </ul>
+                </div>
+
+                <!-- Pillar 3 -->
+                <div class="pillar-card">
+                    <div class="pillar-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <h3>Consultoria</h3>
+                    <p>Descubra exatamente onde está o gargalo.</p>
+                    <ul class="pillar-list">
+                        <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Diagnóstico</li>
+                        <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Estratégia</li>
+                        <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Auditoria</li>
+                        <li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg> Plano de ação</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Differential -->
+        <div class="section-padding differential text-center">
+            <div class="max-w glass-panel">
+                <h2>Não entregamos serviços.<br>Entregamos soluções.</h2>
+                <p>Cada empresa possui desafios diferentes. Por isso não acreditamos em soluções prontas.</p>
+                <p>Analisamos o seu negócio, entendemos os processos, identificamos oportunidades e desenvolvemos uma
+                    estratégia personalizada para gerar crescimento consistente.</p>
+            </div>
+        </div>
+
+        <!-- How it works (Timeline) -->
+        <div id="metodologia" class="section-padding max-w">
+            <div class="badge" style="display:inline-block;">Metodologia</div>
+            <h2 style="font-size: 48px; margin-bottom: 20px;">Como Funciona</h2>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-number">01</div>
+                    <h3>Diagnóstico</h3>
+                    <p>Entendemos seu negócio e identificamos o principal gargalo.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">02</div>
+                    <h3>Estratégia</h3>
+                    <p>Definimos o caminho mais eficiente para resolver o problema.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">03</div>
+                    <h3>Implementação</h3>
+                    <p>Colocamos a solução em prática utilizando marketing, tecnologia ou ambos.</p>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-number">04</div>
+                    <h3>Otimização</h3>
+                    <p>Acompanhamos os resultados e encontramos novas oportunidades de crescimento.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio -->
+        <div class="section-padding max-w">
+            <div class="badge" style="display:inline-block;">Entregáveis</div>
+            <h2 style="font-size: 48px; margin-bottom: 20px;">Nosso Portfólio</h2>
+
+            <div class="portfolio-carousel-container">
+                <div class="portfolio-carousel">
+                    <div class="portfolio-carousel-item">
+                        <img src="images/portfolio_1.jpg" alt="Montclair">
+                    </div>
+                    <div class="portfolio-carousel-item">
+                        <img src="images/portfolio_2.png" alt="Target Fitness">
+                    </div>
+                    <div class="portfolio-carousel-item">
+                        <img src="images/portfolio_3.png" alt="Upper Training">
+                    </div>
+                    <div class="portfolio-carousel-item">
+                        <img src="images/portfolio_4.png" alt="Advocacia Descomplicada">
+                    </div>
+                    <div class="portfolio-carousel-item">
+                        <img src="images/portfolio_5.png" alt="Portfolio Image 5">
+                    </div>
+                    <div class="portfolio-carousel-item">
+                        <img src="images/portfolio_6.png" alt="Portfolio Image 6">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benefits -->
+        <div class="section-padding max-w">
+            <h2 class="text-center" style="font-size: 40px; margin-bottom: 60px;">Por que escolher a Ads Up?</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <h4>Estratégia Personalizada</h4>
+                    <p>Cada empresa possui uma solução diferente.</p>
+                </div>
+                <div class="benefit-card">
+                    <h4>Decisões Baseadas em Dados</h4>
+                    <p>Nada é feito por achismo.</p>
+                </div>
+                <div class="benefit-card">
+                    <h4>Tecnologia Sob Medida</h4>
+                    <p>Construímos sistemas para acelerar processos.</p>
+                </div>
+                <div class="benefit-card">
+                    <h4>Crescimento Sustentável</h4>
+                    <p>Nosso foco é gerar resultados de longo prazo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="section-padding max-w">
+            <h2 class="text-center" style="font-size: 48px; margin-bottom: 20px;">Dúvidas Frequentes</h2>
+
+            <div class="faq-container">
+                <details>
+                    <summary>Vocês atendem empresas de qualquer segmento?</summary>
+                    <div class="faq-content">Sim. Adaptamos nossa estratégia às necessidades de cada negócio.</div>
+                </details>
+                <details>
+                    <summary>Preciso já investir em tráfego pago?</summary>
+                    <div class="faq-content">Não. Primeiro analisamos sua empresa para entender qual solução faz mais
+                        sentido.</div>
+                </details>
+                <details>
+                    <summary>A Ads Up desenvolve sistemas personalizados?</summary>
+                    <div class="faq-content">Sim. Desenvolvemos micro SaaS, dashboards, automações e sistemas sob
+                        medida.</div>
+                </details>
+                <details>
+                    <summary>Vocês trabalham apenas com Meta Ads?</summary>
+                    <div class="faq-content">Não. O tráfego pago é apenas uma das soluções que oferecemos para acelerar
+                        o crescimento dos nossos clientes.</div>
+                </details>
+                <details>
+                    <summary>Quanto custa contratar a Ads Up?</summary>
+                    <div class="faq-content">Cada projeto é personalizado. O investimento depende dos objetivos e da
+                        complexidade da solução.</div>
+                </details>
+                <details>
+                    <summary>Como funciona o diagnóstico?</summary>
+                    <div class="faq-content">Realizamos uma análise estratégica do negócio para identificar os
+                        principais gargalos e apresentar um plano de ação personalizado.</div>
+                </details>
+            </div>
+        </div>
+
+        <!-- Final CTA -->
+        <div class="section-padding final-cta text-center">
+            <div class="max-w glass-panel">
+                <h2>Descubra o que está impedindo seu negócio de crescer.</h2>
+                <p>Faça uma análise inicial com a Ads Up e descubra qual solução faz mais sentido para o seu negócio.
+                </p>
+                <p style="margin-bottom: 48px;">Não importa se o desafio é conquistar clientes, automatizar processos ou
+                    desenvolver uma solução personalizada. Vamos identificar o caminho mais eficiente para o crescimento
+                    da sua empresa.</p>
+
+                <a href="#" class="btn-solid">QUERO ANALISAR MEU NEGÓCIO</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // --- BACKGROUND VIDEO LOGIC ---
+        const canvas = document.getElementById("video-canvas");
+        const context = canvas.getContext("2d");
+        const frameCount = 303;
+        const images = [];
+
+        const currentFrame = index => (
+            `./frames/frame_${(index + 1).toString().padStart(4, '0')}.webp`
+        );
+
+        const preloadCount = 20;
+        let initialFramesLoaded = 0;
+
+        let lastDrawnFrame = -1;
+        let targetFrameIndex = 0;
+        let currentFrameFloat = 0;
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            lastDrawnFrame = -1; // Force redraw on next frame
+        }
+
+        window.addEventListener("resize", resizeCanvas);
+
+        function renderLoop() {
+            // Lógica de Lerp (Interpolação Suave)
+            // Move o frame atual gradualmente em direção ao frame alvo
+            currentFrameFloat += (targetFrameIndex - currentFrameFloat) * 0.1;
+
+            // Arredonda para o índice real inteiro a ser renderizado
+            const frameIndexToDraw = Math.round(currentFrameFloat);
+
+            if (frameIndexToDraw !== lastDrawnFrame) {
+                const img = images[frameIndexToDraw];
+
+                // Só tenta desenhar se a imagem já terminou de ser baixada
+                if (img && img.complete) {
+                    context.clearRect(0, 0, canvas.width, canvas.height);
+
+                    const hRatio = canvas.width / img.width;
+                    const vRatio = canvas.height / img.height;
+                    const ratio = Math.max(hRatio, vRatio);
+
+                    const centerShift_x = (canvas.width - img.width * ratio) / 2;
+                    const centerShift_y = (canvas.height - img.height * ratio) / 2;
+
+                    context.drawImage(
+                        img,
+                        0, 0, img.width, img.height,
+                        centerShift_x, centerShift_y, img.width * ratio, img.height * ratio
+                    );
+
+                    lastDrawnFrame = frameIndexToDraw;
+                }
+            }
+            requestAnimationFrame(renderLoop);
+        }
+
+        function initImages() {
+            const startAnimation = () => {
+                resizeCanvas();
+
+                // Iniciar o loop de renderização contínua
+                requestAnimationFrame(renderLoop);
+
+                // O GSAP agora apenas atualiza o índice alvo de forma determinística e contínua
+                ScrollTrigger.create({
+                    trigger: "#container",
+                    start: "top top",
+                    end: "bottom bottom",
+                    scrub: true,
+                    onUpdate: (self) => {
+                        // Não arredondamos aqui para permitir o cálculo preciso do Lerp
+                        targetFrameIndex = self.progress * (frameCount - 1);
+                    }
+                });
+
+                for (let i = preloadCount; i < frameCount; i++) {
+                    const img = new Image();
+                    img.src = currentFrame(i);
+                    images.push(img);
+                }
+            };
+
+            for (let i = 0; i < preloadCount; i++) {
+                const img = new Image();
+                img.src = currentFrame(i);
+                images.push(img);
+
+                img.onload = () => {
+                    initialFramesLoaded++;
+                    if (initialFramesLoaded === 1) resizeCanvas();
+                    if (initialFramesLoaded === preloadCount) startAnimation();
+                };
+            }
+        }
+
+        initImages();
+
+        // --- UI ANIMATIONS ---
+
+        // Timeline animations
+        gsap.utils.toArray('.timeline-item').forEach(item => {
+            gsap.from(item, {
+                scrollTrigger: {
+                    trigger: item,
+                    start: "top 80%",
+                },
+                x: -50,
+                opacity: 0,
+                duration: 0.8,
+                ease: "power3.out"
+            });
+        });
+
+        // FAQ Accordion close others logic
+        const detailsElements = document.querySelectorAll("details");
+        detailsElements.forEach((targetDetail) => {
+            targetDetail.addEventListener("click", () => {
+                detailsElements.forEach((detail) => {
+                    if (detail !== targetDetail) {
+                        detail.removeAttribute("open");
+                    }
+                });
+            });
+        });
+
+    </script>
+</body>
+
+</html>
